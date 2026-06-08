@@ -406,7 +406,8 @@ async function syncToDb(payload) {
   }
 }
 
-// ── INIT ───────────────────────────────────────────────
+// ── OVERWRITE DEFAULT INIT ─────────────────────────────
+// 重构页面加载的入口函数，使之优先拉取云端数据，若不成功使用内存
 async function init() {
   initCountdown();
   renderTicker();
@@ -414,70 +415,8 @@ async function init() {
   renderTeamsList('sf');
   renderTeamsList('ch');
   
-  // 异步从数据库载入，载入完成后渲染 Ledger
   await loadBetsFromDb();
   renderLedger();
-}
-
-// ── TOAST NOTIFICATION ─────────────────────────────────
-let toastTimeout;
-function showToast(msg, icon = '⚽') {
-  const toast = document.getElementById('toast');
-  document.getElementById('toastMsg').textContent = msg;
-  document.getElementById('toastIcon').textContent = icon;
-  toast.classList.add('show');
-  clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => {
-    toast.classList.remove('show');
-  }, 3000);
-}
-
-// ── COUNTDOWN TIMER ───────────────────────────────────
-function initCountdown() {
-  // 揭幕战：美加墨当地时间 2026-06-11，设定目标时间 2026-06-11 00:00:00 
-  const targetDate = new Date('2026-06-11T00:00:00');
-  const wrap = document.getElementById('countdownWrap');
-  const timer = document.getElementById('countdownTime');
-
-  function update() {
-    const now = new Date();
-    const diff = targetDate - now;
-    if (diff <= 0) {
-      wrap.style.display = 'none';
-      return;
-    }
-    wrap.style.display = 'flex';
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const secs = Math.floor((diff % (1000 * 60)) / 1000);
-
-    timer.innerHTML = `${days}<span>天</span>${String(hours).padStart(2,'0')}<span>时</span>${String(mins).padStart(2,'0')}<span>分</span>${String(secs).padStart(2,'0')}<span>秒</span>`;
-  }
-  update();
-  setInterval(update, 1000);
-}
-
-// ── TICKER ─────────────────────────────────────────────
-function renderTicker() {
-  const items=['西班牙 ESP ★ 夺冠热门','法国 FRA ★ 联合最热','英格兰 ENG ★ 赔率第三','阿根廷 ARG ★ 卫冕冠军','巴西 BRA 五星巴西','葡萄牙 POR','德国 GER 重建完成','荷兰 NED 橙色军团','日本 JPN 亚洲之光','摩洛哥 MAR 非洲骄傲'];
-  const html = items.map(i=>`<span>⚽</span> ${i} `).join('').repeat(3);
-  document.getElementById('ticker').innerHTML = html+html;
-}
-
-// ── INFO GROUPS ────────────────────────────────────────
-function renderGroups() {
-  document.getElementById('groupsGrid').innerHTML = GROUPS.map(g=>`
-    <div class="group-card">
-      <div class="g-name">${g.name}</div>
-      ${g.teams.map(t=>`
-        <div class="g-team ${t.fav?'fav':''}">
-          ${t.fav?'<div class="dot"></div>':'<div style="width:5px"></div>'}
-          <span style="font-size:15px">${t.flag}</span> ${t.name}
-          ${RANK_MAP[t.name]?`<small style="color:#7a8c7e;font-size:10px">#${RANK_MAP[t.name]}</small>`:''}
-          ${t.fav?' ★':''}
-        </div>`).join('')}
-    </div>`).join('');
 }
 
 // ── TOGGLE INFO ────────────────────────────────────────
