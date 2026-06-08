@@ -356,52 +356,90 @@ function lockAdmin() {
 
 // ── DATA SYNC / API ────────────────────────────────────
 let useRemoteApi = true; // 是否启用云端 API 同步，如果接口检测无环境密钥将自动关闭并降级
+const SUPABASE_URL = 'https://ipgxmvxgbngfbtfmtcai.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwZ3htdnhnYm5nZmJ0Zm1mY2FpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MDU4NTgsImV4cCI6MjA4ODE4MTg1OH0.PrRXqvXlKbqUSq3qIRbLX7faOgxXZs9dvHAAOr0HHOM'; // 填你的anon public
 
 async function loadBetsFromDb() {
-  if (!useRemoteApi) return;
   try {
-    const res = await fetch('/api/get-bets');
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
-    }
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/bets?select=*&order=id.desc`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    });
+    if (!res.ok) throw new Error(`status: ${res.status}`);
     const data = await res.json();
-    if (data.fallbackMode) {
-      console.warn('后端提示：缺少环境变量，已自动切换为本地内存模式。');
-      useRemoteApi = false;
-      return;
-    }
-    state.bets = data;
-    // 找出目前最大的 bet_id，更新本地的 nextId 保证不重复
+    state.bets = data.map(item => ({
+      id: item.bet_id,
+      realDbId: item.id,
+      type: item.type,
+      name: item.name,
+      teams: item.teams,
+      amount: item.amount,
+      payout: item.payout,
+      profit: item.profit,
+      paid: item.paid,
+      time: item.created_at
+    }));
     if (state.bets.length > 0) {
-      const maxId = Math.max(...state.bets.map(b => b.id || 0));
+      const maxId = Math.max(...state.bets.map(b => Number(b.id) || 0));
       state.nextId = maxId + 1;
     }
   } catch (err) {
-    console.error('拉取云端数据失败，已自动降级为本地内存模式。原因:', err.message);
+    console.error('加载失败:', err.message);
     useRemoteApi = false;
   }
-}
+  }
 
 async function syncToDb(payload) {
-  if (!useRemoteApi) return true;
   try {
-    const res = await fetch('/api/save-bet', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
+    let url, method, body;
+    if (payload.action === 'insert') {
+      url = `${SUPABASE_URL}/rest/v1/bets`;
+      method = 'POST';
+      body = JSON.stringify({
+        bet_id: String(payload.bet.id),
+        name: payload.bet.name,
+        type: payload.bet.type,
+        teams: payload.bet.teams,
+        amount: payload.bet.amount,
+        payout: payload.bet.payout,
+        profit: payload.bet.profit,
+        paid: false,
+        created_at: new Date(payload.bet.time).toISOString()
+      });
+    } else if (payload.action === 'update_paid') {
+      url = `${SUPABASE_URL}/rest/v1/bets?bet_id=eq.${payload.id}`;
+      method = 'PATCH';
+      body = JSON.stringify({ paid: payload.paid });
+    } else if (payload.action === 'update_all_paid') {
+      url = `${SUPABASE_URL}/rest/v1/bets?id=gt.0`;
+      method = 'PATCH';
+      body = JSON.stringify({ paid: payload.paid });
+    } else if (payload.action === 'delete') {
+      url = `${SUPABASE_URL}/rest/v1/bets?bet_id=eq.${payload.id}`;
+      method = 'DELETE';
+      body = null;
+    } else if (payload.action === 'batch_insert') {
+      url = `${SUPABASE_URL}/rest/v1/bets`;
+      method = 'POST';
+      body = JSON.stringify(payload.bets.map(b => ({
+        bet_id: String(b.id),
+        name: b.name, type: b.type, teams: b.teams,
+        amount: b.amount, payout: b.payout, profit: b.profit,
+        paid: b.paid || false,
+        created_at: new Date(b.time || Date.now()).toISOString()
+      })));
     }
-    const resData = await res.json();
-    if (resData.fallbackMode) {
-      useRemoteApi = false;
-      return true;
-    }
-    return resData.success;
+    const headers = {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json'
+    };
+    const res = await fetch(url, { method, headers, body });
+    return res.ok;
   } catch (err) {
-    console.error('同步云端数据失败:', err.message);
-    showToast('⚠️ 云端同步失败，已暂存至本地内存', '⚠️');
+    console.error('同步失败:', err.message);
     return false;
   }
 }
