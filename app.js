@@ -389,7 +389,6 @@ async function loadBetsFromDb() {
     console.error('加载失败:', err.message);
     useRemoteApi = false;
   }
-  }
 
 async function syncToDb(payload) {
   try {
