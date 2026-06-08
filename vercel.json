@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/get-bets.js": {
+      "regions": ["hnd1"]
+    },
+    "api/save-bet.js": {
+      "regions": ["hnd1"]
+    }
+  }
+}
