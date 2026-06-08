@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 世界杯竞猜站</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="header-eyebrow">公平竞猜 · Fair Play Prediction Pool</div>
+  <h1>2026<br><span>世界杯竞猜站</span></h1>
+  <div class="header-sub">FIFA World Cup · USA / Canada / Mexico · June 11 – July 19, 2026</div>
+  <!-- COUNTDOWN COMPONENT -->
+  <div class="countdown-wrap" id="countdownWrap">
+    <span class="countdown-label">🏆 揭幕战倒计时</span>
+    <div class="countdown-time" id="countdownTime">00<span>天</span>00<span>时</span>00<span>分</span>00<span>秒</span></div>
+  </div>
+</header>
+
+<div class="ticker-wrap">
+  <div class="ticker-track" id="ticker"></div>
+</div>
+
+<main>
+
+  <div class="section-label">📋 赛事资讯 & 竞猜规则</div>
+
+  <div class="info-panel">
+    <div class="info-toggle" onclick="toggleInfo()">
+      <h2>赔率规则说明 + 全部分组情况（点击展开）</h2>
+      <div class="toggle-icon" id="toggleIcon">▼</div>
+    </div>
+    <div class="info-body" id="infoBody">
+      <div class="odds-banner">
+        <div class="odds-card">
+          <div class="odds-card-header">
+            <div class="bet-type">🏅 四强竞猜</div>
+            <div class="bet-ratio">1 : 2</div>
+          </div>
+          <div class="rule-tag">✅ 选4队 · 3队进四强即赢</div>
+          <div class="rule-desc">从全部48支球队中选择 <strong>4支</strong>。<br>至少 <strong>3支</strong> 最终杀入四强，即竞猜成功，赢回 <strong>投注额 × 2</strong>。</div>
+        </div>
+        <div class="odds-card">
+          <div class="odds-card-header">
+            <div class="bet-type">👑 冠军竞猜</div>
+            <div class="bet-ratio">1 : 4</div>
+          </div>
+          <div class="rule-tag">🎯 猜中最终冠军</div>
+          <div class="rule-desc">从全部48支球队中选择 <strong>1支</strong>。<br>该队 <strong>夺冠</strong>，即竞猜成功，赢回 <strong>投注额 × 4</strong>。</div>
+        </div>
+      </div>
+      <div class="analysis-box">
+        <div class="a-title">📊 赔率公平性说明</div>
+        <div class="analysis-row">
+          <div class="analysis-item"><div class="ai-label">四强盘 · 懂球用户猜中率</div><div class="ai-val warn">约 40%～45%</div></div>
+          <div class="analysis-item"><div class="ai-label">四强盘 · 庄家期望收益</div><div class="ai-val good">约 16%（公平边界）</div></div>
+          <div class="analysis-item"><div class="ai-label">冠军盘 · 热门队猜中率</div><div class="ai-val warn">约 15%～20%</div></div>
+          <div class="analysis-item"><div class="ai-label">冠军盘 · 庄家期望收益</div><div class="ai-val good">约 30%～36%</div></div>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:rgba(245,240,232,.5);line-height:1.7">四强盘"3中即赢"降低难度，赔率2倍是公平极限。冠军盘4倍赔率使参与者期望回报约0.64～0.8，对用户相对友善。</div>
+      </div>
+      <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">全部 12 组分组 · ★ 为热门夺冠候选</div>
+      <div class="groups-grid" id="groupsGrid"></div>
+    </div>
+  </div>
+
+  <div class="section-label">🎰 下注赌盘</div>
+
+  <div class="bet-panels">
+    <!-- SEMIFINAL -->
+    <div class="bet-panel">
+      <div class="bet-panel-title">四强竞猜</div>
+      <div class="bet-panel-sub">赔率 1:2 · 从48队中按分组选4队</div>
+      <div class="win-rule"><span>✅</span><span>选4支 · <strong>至少3支进四强</strong> 即赢</span></div>
+      <div class="selection-header">
+        <div class="selection-count" id="sfCount">已选 0 / 4 支球队</div>
+        <span class="clear-btn" id="sfClear" style="display:none" onclick="clearSelected('sf')">一键清空</span>
+      </div>
+      <div class="teams-list" id="sfTeamsList"></div>
+      <div class="bet-form">
+        <div class="form-field">
+          <label>你的名字</label>
+          <input type="text" id="sfName" placeholder="输入你的名字…" maxlength="20">
+        </div>
+        <div class="form-field">
+          <label>投注金额（元）</label>
+          <div class="amount-row" id="sfChips">
+            <span class="amount-chip" onclick="setAmount('sf',10,this)">¥10</span>
+            <span class="amount-chip" onclick="setAmount('sf',50,this)">¥50</span>
+            <span class="amount-chip" onclick="setAmount('sf',100,this)">¥100</span>
+            <span class="amount-chip" onclick="setAmount('sf',200,this)">¥200</span>
+          </div>
+          <input type="number" id="sfAmount" placeholder="或手动输入正整数…" min="1" oninput="updatePayout('sf')">
+        </div>
+        <div class="payout-preview" id="sfPayout"></div>
+        <button class="submit-btn" id="sfSubmit" onclick="submitBet('sf')" disabled>确认下注</button>
+      </div>
+    </div>
+
+    <!-- CHAMPION -->
+    <div class="bet-panel">
+      <div class="bet-panel-title">冠军竞猜</div>
+      <div class="bet-panel-sub">赔率 1:4 · 从48队中按分组选1队</div>
+      <div class="win-rule"><span>👑</span><span>选1支 · <strong>该队夺冠</strong> 即赢</span></div>
+      <div class="selection-header">
+        <div class="selection-count" id="chCount">已选 0 / 1 支球队</div>
+        <span class="clear-btn" id="chClear" style="display:none" onclick="clearSelected('ch')">一键清空</span>
+      </div>
+      <div class="teams-list" id="chTeamsList"></div>
+      <div class="bet-form">
+        <div class="form-field">
+          <label>你的名字</label>
+          <input type="text" id="chName" placeholder="输入你的名字…" maxlength="20">
+        </div>
+        <div class="form-field">
+          <label>投注金额（元）</label>
+          <div class="amount-row" id="chChips">
+            <span class="amount-chip" onclick="setAmount('ch',10,this)">¥10</span>
+            <span class="amount-chip" onclick="setAmount('ch',50,this)">¥50</span>
+            <span class="amount-chip" onclick="setAmount('ch',100,this)">¥100</span>
+            <span class="amount-chip" onclick="setAmount('ch',200,this)">¥200</span>
+          </div>
+          <input type="number" id="chAmount" placeholder="或手动输入正整数…" min="1" oninput="updatePayout('ch')">
+        </div>
+        <div class="payout-preview" id="chPayout"></div>
+        <button class="submit-btn" id="chSubmit" onclick="submitBet('ch')" disabled>确认下注</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEDGER -->
+  <div class="section-label">📒 投注记录</div>
+
+  <div class="ledger">
+    <div class="ledger-header">
+      <h3>当前赌盘记录 <span id="adminModeTag" style="display:none" class="admin-mode-tag">🔐 管理员模式</span></h3>
+      <div class="ledger-stats">
+        <span>总注单: <strong id="statTotal">0</strong></span>
+        <span>总投注: <strong id="statAmount">¥0</strong></span>
+        <span>已收款: <strong id="statPaid" style="color:var(--paid-color)">¥0</strong></span>
+        <span>待收款: <strong id="statUnpaid" style="color:var(--unpaid-color)">¥0</strong></span>
+        <span>潜在赔付: <strong id="statPayout">¥0</strong></span>
+        <button class="admin-lock-btn" id="adminBtn" onclick="openAdminModal()">🔐 管理员登录</button>
+      </div>
+    </div>
+    <!-- ADMIN QUICK ACTIONS (hidden until unlocked) -->
+    <div class="admin-bar" id="adminBar" style="display:none">
+      <span class="admin-bar-label">管理员操作：</span>
+      <button class="admin-lock-btn" onclick="markAllPaid()">✅ 全部标为已付款</button>
+      <button class="admin-lock-btn" onclick="markAllUnpaid()">⭕ 全部重置未付款</button>
+      <button class="admin-lock-btn" onclick="openImportModal()">📥 导入/汇总注单</button>
+      <button class="admin-lock-btn" onclick="openExportModal()">📤 导出全部数据</button>
+      <button class="admin-lock-btn" style="color:#e07b39;border-color:rgba(224,123,57,.3)" onclick="lockAdmin()">🔒 退出管理员</button>
+    </div>
+    <div id="ledgerBody"><div class="ledger-empty">暂无投注记录，快来下注吧 ⚽</div></div>
+  </div>
+
+</main>
+
+<!-- BET SUCCESS MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-icon">🎉</div>
+    <h2>下注成功！</h2>
+    <p>你的竞猜已记录，等待世界杯揭晓答案！</p>
+    <div class="modal-detail" id="modalDetail"></div>
+    <div class="modal-btn-row">
+      <button class="modal-btn primary" onclick="copyShareText()" style="background:#5dd48c;color:#0d2b1a;">📋 复制注单微信发庄家</button>
+      <button class="modal-btn secondary" onclick="closeModal('modal')">好的，期待开奖</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN MODAL -->
+<div class="modal-overlay" id="adminModal">
+  <div class="modal">
+    <div class="modal-icon">🔐</div>
+    <h2>管理员登录</h2>
+    <p>输入管理密码以解锁付款标记功能</p>
+    <input type="password" id="adminPwd" placeholder="· · · · · ·" onkeydown="if(event.key==='Enter')checkAdmin()">
+    <div class="admin-err" id="adminErr"></div>
+    <button class="modal-close" onclick="checkAdmin()" style="margin-top:.5rem">确认</button>
+    <br>
+    <button onclick="closeModal('adminModal')" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;margin-top:.5rem;font-family:'Noto Sans SC',sans-serif">取消</button>
+  </div>
+</div>
+
+<!-- DATA IMPORT MODAL -->
+<div class="modal-overlay" id="importModal">
+  <div class="modal">
+    <div class="modal-icon">📥</div>
+    <h2>导入/汇总注单</h2>
+    <p>粘贴用户发给您的注单分享文本或导出的 JSON 数据</p>
+    <textarea id="importData" placeholder="在此粘贴注单文本或整个 JSON 数组..."></textarea>
+    <div class="admin-err" id="importErr"></div>
+    <div class="modal-btn-row">
+      <button class="modal-btn primary" onclick="submitImport()">确认导入</button>
+      <button class="modal-btn secondary" onclick="closeModal('importModal')">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- DATA EXPORT MODAL -->
+<div class="modal-overlay" id="exportModal">
+  <div class="modal">
+    <div class="modal-icon">📤</div>
+    <h2>导出投注数据</h2>
+    <p>复制下方数据，可用于备份或在其他设备上导入</p>
+    <textarea id="exportData" readonly onclick="this.select()"></textarea>
+    <div style="margin-top:5px;font-size:11px;color:var(--muted)">点击上方文本框可全选</div>
+    <div class="modal-btn-row">
+      <button class="modal-btn primary" onclick="copyExportData()">📋 复制到剪切板</button>
+      <button class="modal-btn secondary" onclick="closeModal('exportModal')">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST NOTIFICATION -->
+<div class="toast" id="toast">
+  <span id="toastIcon">⚽</span>
+  <span id="toastMsg">提示信息</span>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

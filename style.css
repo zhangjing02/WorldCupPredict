@@ -1,0 +1,203 @@
+:root {
+  --gold:#D4A843; --gold-light:#F0C96A;
+  --green:#1a7a4a; --pitch:#0d2b1a;
+  --pitch-mid:#122a1c; --pitch-surface:#163320;
+  --white:#f5f0e8; --muted:#7a8c7e; --red:#c0392b;
+  --paid-color:#5dd48c; --unpaid-color:#e07b39;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--pitch);color:var(--white);font-family:'Noto Sans SC',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(0deg,transparent 49.5%,rgba(255,255,255,.03) 49.5%,rgba(255,255,255,.03) 50.5%,transparent 50.5%),linear-gradient(90deg,transparent 49.5%,rgba(255,255,255,.03) 49.5%,rgba(255,255,255,.03) 50.5%,transparent 50.5%);background-size:80px 80px;pointer-events:none;z-index:0}
+
+/* HEADER */
+header{position:relative;z-index:10;text-align:center;padding:3rem 1rem 1.5rem;border-bottom:1px solid rgba(212,168,67,.2);background:linear-gradient(180deg,rgba(13,43,26,.95) 0%,transparent 100%)}
+.header-eyebrow{font-size:11px;letter-spacing:.3em;color:var(--gold);text-transform:uppercase;margin-bottom:.6rem}
+header h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,10vw,6.5rem);line-height:.9;letter-spacing:.02em}
+header h1 span{color:var(--gold)}
+.header-sub{margin-top:.8rem;font-size:13px;color:var(--muted);letter-spacing:.1em}
+
+/* COUNTDOWN */
+.countdown-wrap{display:none;justify-content:center;align-items:center;gap:12px;margin:1.5rem auto 0;padding:8px 22px;background:rgba(13,43,26,.6);border:1px solid rgba(212,168,67,.25);border-radius:30px;width:fit-content;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 4px 20px rgba(0,0,0,.25);animation:float 4s ease-in-out infinite;z-index:10;position:relative}
+.countdown-label{font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;font-weight:400}
+.countdown-time{display:flex;align-items:center;gap:4px;font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--gold-light);letter-spacing:.05em;line-height:1}
+.countdown-time span{font-size:12px;color:var(--white);font-family:'Noto Sans SC',sans-serif;font-weight:300;margin-left:2px;margin-right:6px}
+.countdown-time span:last-child{margin-right:0}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+
+/* TICKER */
+.ticker-wrap{position:relative;z-index:10;background:var(--green);padding:7px 0;overflow:hidden;border-bottom:1px solid rgba(212,168,67,.3);margin-top:1.5rem}
+.ticker-track{display:flex;white-space:nowrap;animation:ticker 40s linear infinite;font-size:12px;letter-spacing:.1em;color:rgba(245,240,232,.8)}
+.ticker-track span{margin:0 2rem;color:var(--gold)}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+main{position:relative;z-index:10;max-width:1100px;margin:0 auto;padding:2rem 1.2rem 4rem}
+
+.section-label{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.05em;color:var(--gold);margin-bottom:1rem;display:flex;align-items:center;gap:.6rem}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(212,168,67,.4),transparent)}
+
+/* GLASSMORPHISM INFO PANEL */
+.info-panel{background:rgba(22,51,32,.65);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(212,168,67,.2);border-radius:12px;padding:1.4rem 1.6rem;margin-bottom:2.5rem;box-shadow:0 8px 32px 0 rgba(0,0,0,.3)}
+.info-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.info-toggle h2{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.08em;color:var(--gold)}
+.toggle-icon{font-size:1.2rem;color:var(--gold);transition:transform .3s}
+.toggle-icon.open{transform:rotate(180deg)}
+.info-body{display:none;margin-top:1.2rem}
+.info-body.open{display:block}
+
+.odds-banner{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.2rem}
+.odds-card{background:var(--pitch-mid);border:1px solid rgba(212,168,67,.25);border-radius:10px;padding:14px 16px}
+.odds-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.odds-card .bet-type{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+.odds-card .bet-ratio{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:var(--gold-light);line-height:1}
+.rule-tag{display:inline-block;background:rgba(212,168,67,.15);border:1px solid rgba(212,168,67,.3);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--gold);margin-bottom:8px}
+.odds-card .rule-desc{font-size:12px;color:rgba(245,240,232,.65);line-height:1.7}
+.odds-card .rule-desc strong{color:var(--white)}
+
+.analysis-box{background:rgba(42,100,150,.12);border:1px solid rgba(42,100,150,.3);border-radius:8px;padding:12px 14px;margin-bottom:1.2rem}
+.analysis-box .a-title{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6ab0d4;margin-bottom:8px}
+.analysis-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.analysis-item{background:rgba(0,0,0,.2);border-radius:6px;padding:8px 10px;font-size:12px}
+.analysis-item .ai-label{color:var(--muted);margin-bottom:3px;font-size:11px}
+.analysis-item .ai-val{color:var(--white);font-weight:500}
+.analysis-item .ai-val.good{color:#5dd48c}
+.analysis-item .ai-val.warn{color:var(--gold-light)}
+
+.groups-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:8px}
+.group-card{background:var(--pitch-mid);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:10px 12px;font-size:12px}
+.group-card .g-name{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--gold);letter-spacing:.05em;margin-bottom:6px;border-bottom:1px solid rgba(212,168,67,.15);padding-bottom:4px}
+.group-card .g-team{padding:2px 0;color:rgba(245,240,232,.75);display:flex;align-items:center;gap:5px}
+.group-card .g-team.fav{color:var(--white);font-weight:500}
+.group-card .g-team .dot{width:5px;height:5px;border-radius:50%;background:var(--gold);flex-shrink:0}
+
+/* BET PANELS */
+.bet-panels{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2.5rem}
+@media(max-width:700px){.bet-panels{grid-template-columns:1fr}.odds-banner{grid-template-columns:1fr}}
+
+/* GLASSMORPHISM BET PANEL & LEDGER */
+.bet-panel{background:rgba(22,51,32,.65);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(212,168,67,.2);border-radius:14px;padding:1.4rem;position:relative;overflow:hidden;box-shadow:0 8px 32px 0 rgba(0,0,0,.3)}
+.bet-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold-light),var(--gold))}
+.bet-panel-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.05em;color:var(--white);margin-bottom:.15rem}
+.bet-panel-sub{font-size:11px;color:var(--muted);letter-spacing:.06em;margin-bottom:.5rem}
+.win-rule{display:inline-flex;align-items:center;gap:6px;background:rgba(93,212,140,.1);border:1px solid rgba(93,212,140,.25);border-radius:20px;padding:4px 12px;font-size:12px;color:#5dd48c;margin-bottom:.8rem}
+
+/* TEAM LIST */
+.teams-list{display:flex;flex-direction:column;gap:2px;margin-bottom:1rem;max-height:360px;overflow-y:auto;padding-right:4px}
+.teams-list::-webkit-scrollbar{width:4px}
+.teams-list::-webkit-scrollbar-thumb{background:rgba(212,168,67,.3);border-radius:2px}
+
+.group-header{display:flex;align-items:center;gap:8px;padding:6px 4px 3px;position:sticky;top:0;z-index:2;background:rgba(22, 51, 32, 0.95);backdrop-filter:blur(4px)}
+.group-header .gh-label{font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:.08em;color:var(--gold);opacity:.85}
+.group-header::after{content:'';flex:1;height:1px;background:rgba(212,168,67,.2)}
+
+.team-btn{display:flex;align-items:center;gap:9px;padding:7px 10px;background:var(--pitch-mid);border:1px solid rgba(255,255,255,.06);border-radius:8px;cursor:pointer;transition:all .2s cubic-bezier(0.4, 0, 0.2, 1);color:var(--white);font-family:'Noto Sans SC',sans-serif;font-weight:300;font-size:13px;text-align:left;width:100%}
+.team-btn:hover{border-color:rgba(212,168,67,.4);background:rgba(212,168,67,.08);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.team-btn.selected{border-color:var(--gold);background:rgba(212,168,67,.15);color:var(--gold-light);box-shadow:0 0 15px rgba(212,168,67,.2)}
+.team-btn .flag-emoji{font-size:18px;line-height:1;flex-shrink:0}
+.team-btn .t-name{flex:1;font-size:13px}
+.team-btn .t-hot{font-size:10px;color:var(--gold);margin-left:2px}
+.team-btn .t-rank{font-size:10px;color:var(--muted);white-space:nowrap}
+.team-btn .check{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .15s}
+.team-btn.selected .check{background:var(--gold);border-color:var(--gold);color:var(--pitch)}
+
+/* SELECTION HEADER with CLEAR BTN */
+.selection-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem;min-height:18px}
+.selection-header .selection-count{margin-bottom:0}
+.clear-btn{font-size:11px;color:var(--muted);cursor:pointer;transition:all .15s;text-decoration:none;border:1px solid rgba(255,255,255,.1);padding:1px 8px;border-radius:12px;background:rgba(255,255,255,.03);user-select:none}
+.clear-btn:hover{color:var(--red);border-color:rgba(192,57,43,.4);background:rgba(192,57,43,.08)}
+
+/* FORM */
+.bet-form{margin-top:.5rem}
+.form-field{margin-bottom:.7rem}
+.form-field label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.form-field input{width:100%;background:var(--pitch-mid);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:9px 12px;color:var(--white);font-family:'Noto Sans SC',sans-serif;font-size:14px;outline:none;transition:border-color .18s}
+.form-field input:focus{border-color:var(--gold)}
+.form-field input::placeholder{color:rgba(122,140,126,.5)}
+
+.amount-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:.5rem}
+.amount-chip{padding:5px 11px;background:var(--pitch-mid);border:1px solid rgba(255,255,255,.08);border-radius:20px;font-size:12px;color:var(--muted);cursor:pointer;transition:all .15s;font-family:'Noto Sans SC',sans-serif}
+.amount-chip:hover,.amount-chip.active{border-color:var(--gold);color:var(--gold)}
+
+.submit-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border:none;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.08em;color:var(--pitch);cursor:pointer;transition:all .2s;margin-top:.3rem}
+.submit-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(212,168,67,.35)}
+.submit-btn:disabled{background:#2a3d30;color:var(--muted);cursor:not-allowed;transform:none;box-shadow:none}
+
+.payout-preview{font-size:12px;color:var(--muted);text-align:center;margin-top:7px;min-height:18px;line-height:1.5}
+.payout-preview strong{color:var(--gold-light)}
+
+/* LEDGER */
+.ledger{background:rgba(22,51,32,.65);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(212,168,67,.2);border-radius:14px;overflow:hidden;box-shadow:0 8px 32px 0 rgba(0,0,0,.3)}
+.ledger-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.4rem;border-bottom:1px solid rgba(255,255,255,.06);flex-wrap:wrap;gap:8px}
+.ledger-header h3{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.05em;color:var(--gold)}
+.ledger-stats{display:flex;gap:1.2rem;font-size:12px;color:var(--muted);flex-wrap:wrap;align-items:center}
+.ledger-stats strong{color:var(--white)}
+
+/* ADMIN PANEL INSIDE LEDGER */
+.admin-bar{background:rgba(0,0,0,.25);border-bottom:1px solid rgba(255,255,255,.06);padding:8px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.admin-bar-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.admin-lock-btn{padding:4px 14px;border-radius:20px;font-size:12px;cursor:pointer;font-family:'Noto Sans SC',sans-serif;transition:all .15s;border:1px solid rgba(212,168,67,.3);background:rgba(212,168,67,.08);color:var(--gold)}
+.admin-lock-btn:hover{background:rgba(212,168,67,.2)}
+.admin-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;border:none;font-family:'Noto Sans SC',sans-serif}
+.admin-badge.paid{background:rgba(93,212,140,.15);color:var(--paid-color);border:1px solid rgba(93,212,140,.3)}
+.admin-badge.unpaid{background:rgba(224,123,57,.12);color:var(--unpaid-color);border:1px solid rgba(224,123,57,.3)}
+.admin-badge:hover{opacity:.8}
+
+.ledger-empty{padding:2rem;text-align:center;color:var(--muted);font-size:14px}
+.ledger-table{width:100%;border-collapse:collapse;font-size:13px}
+.ledger-table th{text-align:left;padding:8px 12px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid rgba(255,255,255,.05)}
+.ledger-table td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+.ledger-table tr:last-child td{border-bottom:none}
+.ledger-table tr:hover td{background:rgba(255,255,255,.02)}
+
+.type-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;letter-spacing:.05em;font-weight:500}
+.badge-sf{background:rgba(26,122,74,.3);color:#5dd48c;border:1px solid rgba(26,122,74,.4)}
+.badge-ch{background:rgba(212,168,67,.2);color:var(--gold-light);border:1px solid rgba(212,168,67,.3)}
+.payout-amount{color:var(--gold-light);font-weight:500}
+
+/* PAID STATUS BADGE in table */
+.status-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
+.status-badge.paid{background:rgba(93,212,140,.15);color:var(--paid-color);border:1px solid rgba(93,212,140,.3)}
+.status-badge.unpaid{background:rgba(224,123,57,.12);color:var(--unpaid-color);border:1px solid rgba(224,123,57,.25)}
+.status-badge:hover{opacity:.75}
+
+.del-btn{background:none;border:1px solid rgba(192,57,43,.3);border-radius:6px;color:rgba(192,57,43,.6);padding:3px 8px;font-size:11px;cursor:pointer;transition:all .15s;font-family:'Noto Sans SC',sans-serif}
+.del-btn:hover{background:rgba(192,57,43,.15);color:var(--red);border-color:var(--red)}
+
+/* ACTIVE STATE MICRO ANIMATION */
+.submit-btn:active, .admin-lock-btn:active, .amount-chip:active, .team-btn:active, .modal-close:active, .modal-btn:active{transform:scale(.97)}
+
+/* ADMIN MODALS & IMPORT EXPORT */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--pitch-surface);border:1px solid rgba(212,168,67,.3);border-radius:16px;padding:2rem;max-width:420px;width:90%;text-align:center;transform:translateY(20px);transition:transform .25s;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-icon{font-size:3rem;margin-bottom:.8rem}
+.modal h2{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.05em;color:var(--gold);margin-bottom:.5rem}
+.modal p{font-size:14px;color:var(--muted);line-height:1.7}
+.modal-detail{margin:1rem 0;background:var(--pitch-mid);border-radius:8px;padding:1rem;font-size:13px;text-align:left}
+.modal-detail div{margin-bottom:5px;color:rgba(245,240,232,.7);line-height:1.6}
+.modal-detail strong{color:var(--white)}
+.modal-close{margin-top:1rem;padding:10px 28px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border:none;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;color:var(--pitch);cursor:pointer}
+
+/* MODAL TEXTAREA & ROW BTNS */
+.modal textarea{width:100%;height:110px;background:var(--pitch-mid);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:10px;color:var(--white);font-size:12px;outline:none;margin-top:1rem;resize:none;font-family:monospace;line-height:1.5;transition:border-color .18s}
+.modal textarea:focus{border-color:var(--gold)}
+.modal-btn-row{display:flex;justify-content:center;gap:10px;margin-top:1rem;flex-wrap:wrap}
+.modal-btn{padding:8px 20px;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;justify-content:center}
+.modal-btn.primary{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--pitch)}
+.modal-btn.secondary{background:none;border:1px solid rgba(255,255,255,.15);color:var(--white)}
+.modal-btn.secondary:hover{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.25)}
+
+/* ADMIN MODAL */
+#adminModal .modal{max-width:360px}
+#adminModal input{width:100%;background:var(--pitch-mid);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:10px 14px;color:var(--white);font-size:15px;outline:none;text-align:center;letter-spacing:.2em;margin-top:1rem}
+#adminModal input:focus{border-color:var(--gold)}
+#adminModal .modal-close{margin-top:.7rem}
+.admin-err{color:#e07b39;font-size:12px;margin-top:6px;min-height:18px}
+.admin-mode-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 12px;border-radius:20px;font-size:11px;background:rgba(93,212,140,.15);color:var(--paid-color);border:1px solid rgba(93,212,140,.3);margin-left:8px;vertical-align:middle}
+
+/* TOAST */
+.toast{position:fixed;bottom:-60px;left:50%;transform:translateX(-50%);background:rgba(13,43,26,.95);border:1px solid var(--gold);color:var(--white);padding:10px 22px;border-radius:30px;font-size:12px;z-index:1000;opacity:0;pointer-events:none;transition:all .3s cubic-bezier(0.175,0.885,0.32,1.275);box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 15px rgba(212,168,67,.2);display:flex;align-items:center;gap:8px}
+.toast.show{bottom:30px;opacity:1}
+
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-thumb{background:rgba(212,168,67,.2);border-radius:3px}
