@@ -347,6 +347,13 @@ function checkAdmin() {
 
 function lockAdmin() {
   state.adminUnlocked = false;
+  document.getElementById('adminBar').style.display='none';
+  document.getElementById('adminModeTag').style.display='none';
+  document.getElementById('adminBtn').textContent='🔐 管理员登录';
+  document.getElementById('adminBtn').style.color='';
+  renderLedger();
+}
+
 // ── DATA SYNC / API ────────────────────────────────────
 let useRemoteApi = true; // 是否启用云端 API 同步，如果接口检测无环境密钥将自动关闭并降级
 
