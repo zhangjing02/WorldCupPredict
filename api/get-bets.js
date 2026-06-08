@@ -56,7 +56,8 @@ export default async function handler(req, res) {
     }));
 
     return res.status(200).json(formattedData);
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
+} catch (error) {
+  console.error('fetch error detail:', error.cause || error.message, JSON.stringify(error));
+  return res.status(500).json({ error: error.message, cause: String(error.cause) });
+}
 }
