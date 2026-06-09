@@ -36,7 +36,7 @@ const state = {
 let lastSubmittedBetShareText = '';
 
 // ── SUPABASE 直连配置 ──────────────────────────────────
-const SUPABASE_URL = 'https://ipgxmvxgbngfbtfmtcai.supabase.co';
+const SUPABASE_URL = 'https://ipgxmvxgbngfbtfmfcai.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwZ3htdnhnYm5nZmJ0Zm1mY2FpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MDU4NTgsImV4cCI6MjA4ODE4MTg1OH0.PrRXqvXlKbqUSq3qIRbLX7faOgxXZs9dvHAAOr0HHOM'; // 替换为 Legacy anon public key (eyJ...)
 let useRemoteApi = true;
 
