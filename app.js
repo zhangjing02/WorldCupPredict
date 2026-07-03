@@ -712,6 +712,17 @@ async function deleteBet(id) {
 }
 
 function renderLedger() {
+  const dbStatusEl = document.getElementById('dbStatusTag');
+  if (dbStatusEl) {
+    if (useRemoteApi) {
+      dbStatusEl.className = 'db-status-tag online';
+      dbStatusEl.innerHTML = '🟢 云端已连接';
+    } else {
+      dbStatusEl.className = 'db-status-tag offline';
+      dbStatusEl.innerHTML = '⚠️ 未连通云端 (投注记录仅暂存本地)';
+    }
+  }
+
   const totalAmount  = state.bets.reduce((a,b)=>a+b.amount,0);
   const totalPayout  = state.bets.reduce((a,b)=>a+b.payout,0);
   const paidAmount   = state.bets.filter(b=>b.paid).reduce((a,b)=>a+b.amount,0);
