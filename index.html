@@ -67,6 +67,22 @@
     </div>
   </div>
 
+  <div class="section-label">🏆 淘汰赛进程与最新赛况</div>
+
+  <div class="scoreboard-panel">
+    <div class="scoreboard-header">
+      <div class="scoreboard-title">赛况数据由 openfootball 自动同步</div>
+      <div class="scoreboard-tabs">
+        <button class="score-tab" id="tab-r32" onclick="switchScoreTab('r32')">32强战</button>
+        <button class="score-tab active" id="tab-r16" onclick="switchScoreTab('r16')">16强战</button>
+        <button class="score-tab" id="tab-rfinal" onclick="switchScoreTab('rfinal')">后续淘汰赛</button>
+      </div>
+    </div>
+    <div class="score-list" id="scoreList">
+      <div class="ledger-empty">📡 正在获取最新赛况，请稍候...</div>
+    </div>
+  </div>
+
   <div class="section-label">🎰 下注赌盘</div>
 
   <div class="bet-panels">

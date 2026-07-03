@@ -201,3 +201,181 @@ main{position:relative;z-index:10;max-width:1100px;margin:0 auto;padding:2rem 1.
 
 ::-webkit-scrollbar{width:6px}
 ::-webkit-scrollbar-thumb{background:rgba(212,168,67,.2);border-radius:3px}
+
+/* SCOREBOARD PANEL */
+.scoreboard-panel {
+  background: rgba(22,51,32,.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(212,168,67,.2);
+  border-radius: 12px;
+  padding: 1.4rem 1.6rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,.3);
+}
+.scoreboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+  padding-bottom: 10px;
+}
+.scoreboard-title {
+  font-size: 11px;
+  letter-spacing: .08em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.scoreboard-tabs {
+  display: flex;
+  gap: 6px;
+}
+.score-tab {
+  padding: 5px 14px;
+  background: var(--pitch-mid);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .2s;
+  font-family: 'Noto Sans SC', sans-serif;
+}
+.score-tab:hover {
+  border-color: rgba(212,168,67,.4);
+  color: var(--gold-light);
+}
+.score-tab.active {
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  border-color: var(--gold);
+  color: var(--pitch);
+  font-weight: 500;
+  box-shadow: 0 0 10px rgba(212,168,67,.25);
+}
+
+.score-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 12px;
+  margin-top: 1.2rem;
+}
+
+/* MATCH CARD */
+.match-card {
+  background: var(--pitch-mid);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all .2s;
+}
+.match-card:hover {
+  border-color: rgba(212,168,67,.2);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0,0,0,.2);
+}
+.match-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  padding-bottom: 4px;
+}
+.match-round {
+  color: var(--gold-light);
+  font-weight: 500;
+}
+.match-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.match-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 0;
+}
+.match-team-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(245,240,232,.9);
+}
+.match-team-info.winner {
+  color: var(--white);
+  font-weight: bold;
+}
+.match-team-info.loser {
+  opacity: 0.5;
+}
+.match-team-info .flag {
+  font-size: 16px;
+  line-height: 1;
+}
+.match-score {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem;
+  color: var(--white);
+  letter-spacing: .05em;
+  min-width: 20px;
+  text-align: right;
+}
+.match-score.winner {
+  color: var(--gold-light);
+}
+.match-score.loser {
+  opacity: 0.5;
+}
+.match-footer {
+  margin-top: 8px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(255,255,255,.04);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  color: var(--muted);
+}
+.match-p-badge {
+  background: rgba(224,123,57,.15);
+  color: var(--unpaid-color);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  border: 1px solid rgba(224,123,57,.3);
+}
+
+/* SETTLED STATUS BADGES */
+.status-badge-settled {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.settled-won {
+  background: rgba(93,212,140,.12);
+  color: var(--paid-color);
+  border: 1px solid rgba(93,212,140,.25);
+}
+.settled-lost {
+  background: rgba(192,57,43,.12);
+  color: #ff7675;
+  border: 1px solid rgba(192,57,43,.25);
+}
+.settled-pending {
+  background: rgba(255,255,255,.04);
+  color: var(--muted);
+  border: 1px solid rgba(255,255,255,.08);
+}

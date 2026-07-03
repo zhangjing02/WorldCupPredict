@@ -21,6 +21,21 @@ const RANK_MAP = {
   '瑞士':17,'日本':20,'韩国':22,'澳大利亚':26
 };
 
+const TEAM_NAME_MAP = {
+  'Mexico': '墨西哥', 'South Africa': '南非', 'South Korea': '韩国', 'Czech Republic': '捷克', 'Czechia': '捷克',
+  'Canada': '加拿大', 'Bosnia & Herzegovina': '波黑', 'Bosnia and Herzegovina': '波黑', 'Qatar': '卡塔尔', 'Switzerland': '瑞士',
+  'Brazil': '巴西', 'Morocco': '摩洛哥', 'Scotland': '苏格兰', 'Haiti': '海地',
+  'USA': '美国', 'Paraguay': '巴拉圭', 'Australia': '澳大利亚', 'Turkey': '土耳其', 'Türkiye': '土耳其',
+  'Germany': '德国', 'Ivory Coast': '科特迪瓦', "Côte d'Ivoire": '科特迪瓦', 'Ecuador': '厄瓜多尔', 'Curacao': '库拉索', 'Curaçao': '库拉索',
+  'Netherlands': '荷兰', 'Japan': '日本', 'Sweden': '瑞典', 'Tunisia': '突尼斯',
+  'Belgium': '比利时', 'Egypt': '埃及', 'Iran': '伊朗', 'New Zealand': '新西兰',
+  'Spain': '西班牙', 'Uruguay': '乌拉圭', 'Saudi Arabia': '沙特', 'Cape Verde': '佛得角', 'Cabo Verde': '佛得角',
+  'France': '法国', 'Norway': '挪威', 'Senegal': '塞内加尔', 'Iraq': '伊拉克',
+  'Argentina': '阿根廷', 'Austria': '奥地利', 'Algeria': '阿尔及利亚', 'Jordan': '约旦',
+  'Portugal': '葡萄牙', 'Colombia': '哥伦比亚', 'Congo DR': '刚果', 'DR Congo': '刚果', 'Congo': '刚果', 'Uzbekistan': '乌兹别克斯坦',
+  'England': '英格兰', 'Croatia': '克罗地亚', 'Ghana': '加纳', 'Panama': '巴拿马'
+};
+
 const ODDS = {sf:2, ch:4};
 const MAX_SEL = {sf:4, ch:1};
 const ADMIN_PASSWORD = '2026wc';
@@ -31,6 +46,11 @@ const state = {
   bets: [],
   nextId: 1,
   adminUnlocked: false,
+  matches: [],
+  eliminatedTeams: new Set(),
+  semifinalists: new Set(),
+  champion: null,
+  currentScoreTab: 'r16',
 };
 
 let lastSubmittedBetShareText = '';
@@ -134,6 +154,142 @@ async function syncToDb(payload) {
     showToast('⚠️ 云端同步失败，已暂存至本地内存', '⚠️');
     return false;
   }
+}
+
+// ── 比分获取与自动结算逻辑 ──────────────────────────────────
+const SCORE_CACHE_KEY = 'wc2026_scores_cache';
+const SCORE_CACHE_TTL = 10 * 60 * 1000; // 10分钟
+
+async function fetchWorldCupData() {
+  const cached = localStorage.getItem(SCORE_CACHE_KEY);
+  if (cached) {
+    try {
+      const parsed = JSON.parse(cached);
+      if (Date.now() - parsed.timestamp < SCORE_CACHE_TTL) {
+        state.matches = parsed.data;
+        return;
+      }
+    } catch (e) {
+      localStorage.removeItem(SCORE_CACHE_KEY);
+    }
+  }
+
+  try {
+    const res = await fetch('https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json');
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    const json = await res.json();
+    if (json && Array.isArray(json.matches)) {
+      state.matches = json.matches;
+      localStorage.setItem(SCORE_CACHE_KEY, JSON.stringify({
+        timestamp: Date.now(),
+        data: json.matches
+      }));
+    }
+  } catch (err) {
+    console.error('获取世界杯数据失败，正在尝试使用缓存:', err.message);
+    if (cached) {
+      try {
+        state.matches = JSON.parse(cached).data;
+      } catch (e) {}
+    }
+  }
+}
+
+function processTournamentData() {
+  state.eliminatedTeams.clear();
+  state.semifinalists.clear();
+  state.champion = null;
+
+  if (!state.matches || !state.matches.length) return;
+
+  const knockoutTeams = new Set();
+  const knockoutRounds = ["Round of 32", "Round of 16", "Quarter-final", "Semi-final", "Final"];
+  
+  state.matches.forEach(m => {
+    const isKnockout = knockoutRounds.some(r => m.round && m.round.includes(r));
+    if (!isKnockout) return;
+
+    const t1Cn = TEAM_NAME_MAP[m.team1] || m.team1;
+    const t2Cn = TEAM_NAME_MAP[m.team2] || m.team2;
+    knockoutTeams.add(t1Cn);
+    knockoutTeams.add(t2Cn);
+
+    if (m.score) {
+      let w = null;
+      let l = null;
+
+      if (m.score.p) {
+        w = m.score.p[0] > m.score.p[1] ? t1Cn : t2Cn;
+        l = m.score.p[0] > m.score.p[1] ? t2Cn : t1Cn;
+      } else if (m.score.et) {
+        w = m.score.et[0] > m.score.et[1] ? t1Cn : t2Cn;
+        l = m.score.et[0] > m.score.et[1] ? t2Cn : t1Cn;
+      } else if (m.score.ft) {
+        if (m.score.ft[0] !== m.score.ft[1]) {
+          w = m.score.ft[0] > m.score.ft[1] ? t1Cn : t2Cn;
+          l = m.score.ft[0] > m.score.ft[1] ? t2Cn : t1Cn;
+        }
+      }
+
+      if (w && l) {
+        state.eliminatedTeams.add(l);
+
+        if (m.round && m.round.includes("Final") && !m.round.includes("Semi-final")) {
+          state.champion = w;
+        }
+      }
+    }
+
+    if (m.round && m.round.includes("Semi-final")) {
+      state.semifinalists.add(t1Cn);
+      state.semifinalists.add(t2Cn);
+    }
+  });
+
+  const hasKnockoutStarted = state.matches.some(m => m.round && m.round.includes("Round of 32") && m.score && m.score.ft);
+  if (hasKnockoutStarted) {
+    GROUPS.forEach(g => {
+      g.teams.forEach(t => {
+        if (!knockoutTeams.has(t.name)) {
+          state.eliminatedTeams.add(t.name);
+        }
+      });
+    });
+  }
+}
+
+function checkBetStatus(bet) {
+  if (bet.type === 'ch') {
+    const team = bet.teams[0];
+    if (state.champion && state.champion === team) {
+      return { status: 'won', text: '🎉 猜中冠军' };
+    }
+    if (state.eliminatedTeams.has(team)) {
+      return { status: 'lost', text: '❌ 已被淘汰' };
+    }
+    return { status: 'pending', text: '⏳ 待开奖' };
+  } else if (bet.type === 'sf') {
+    const selected = bet.teams;
+    let semiCount = 0;
+    let elimCount = 0;
+    
+    selected.forEach(t => {
+      if (state.semifinalists.has(t)) {
+        semiCount++;
+      } else if (state.eliminatedTeams.has(t)) {
+        elimCount++;
+      }
+    });
+
+    if (semiCount >= 3) {
+      return { status: 'won', text: `🎉 猜中四强 (${semiCount}/4)` };
+    }
+    if (elimCount > 1) {
+      return { status: 'lost', text: `❌ 失败 (已淘汰 ${elimCount} 队)` };
+    }
+    return { status: 'pending', text: `⏳ 待开奖 (晋级 ${semiCount} · 淘汰 ${elimCount})` };
+  }
+  return { status: 'pending', text: '⏳ 待开奖' };
 }
 
 // ── INIT ───────────────────────────────────────────────
@@ -580,6 +736,7 @@ function renderLedger() {
       <tr>
         <th>#</th><th>姓名</th><th>类型</th><th>竞猜内容</th>
         <th>获奖条件</th><th>金额</th><th>若中赔付</th><th>下注时间</th>
+        <th>竞猜状态</th>
         ${adminCols}
       </tr>
     </thead>
@@ -592,6 +749,10 @@ function renderLedger() {
           ? `<td><button class="del-btn" onclick="deleteBet('${b.id}')">撤单</button></td>`
           : '';
         const timeDate = b.time instanceof Date ? b.time : new Date(b.time);
+        
+        const statusInfo = checkBetStatus(b);
+        const statusBadge = `<span class="status-badge-settled settled-${statusInfo.status}">${statusInfo.text}</span>`;
+
         return `<tr>
           <td style="color:var(--muted)">${b.id}</td>
           <td><strong>${b.name}</strong></td>
@@ -601,6 +762,7 @@ function renderLedger() {
           <td>¥${b.amount}</td>
           <td class="payout-amount">¥${b.payout.toLocaleString()}</td>
           <td style="font-size:11px;color:var(--muted)">${fmt(timeDate)}</td>
+          <td>${statusBadge}</td>
           <td>${paidBadge}</td>
           ${delBtn}
         </tr>`;
@@ -616,6 +778,174 @@ function fmt(d) {
 
 function closeModal(id) {
   document.getElementById(id).classList.remove('open');
+}
+
+function getTeamFlag(nameCn) {
+  for (const g of GROUPS) {
+    for (const t of g.teams) {
+      if (t.name === nameCn) return t.flag;
+    }
+  }
+  return '⚽';
+}
+
+function switchScoreTab(tab) {
+  state.currentScoreTab = tab;
+  document.querySelectorAll('.scoreboard-tabs .score-tab').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  const activeBtn = document.getElementById(`tab-${tab}`);
+  if (activeBtn) activeBtn.classList.add('active');
+  renderScoreboard();
+}
+
+function renderScoreboard() {
+  const container = document.getElementById('scoreList');
+  if (!container) return;
+
+  if (!state.matches || !state.matches.length) {
+    container.innerHTML = '<div class="ledger-empty">暂无比赛赛况数据 ⚽</div>';
+    return;
+  }
+
+  const tab = state.currentScoreTab;
+  const filtered = state.matches.filter(m => {
+    const r = m.round || '';
+    if (tab === 'r32') return r.includes('Round of 32');
+    if (tab === 'r16') return r.includes('Round of 16');
+    if (tab === 'rfinal') {
+      return r.includes('Quarter-final') || r.includes('Semi-final') || r.includes('Match for third place') || (r.includes('Final') && !r.includes('Semi-final'));
+    }
+    return false;
+  });
+
+  if (!filtered.length) {
+    container.innerHTML = '<div class="ledger-empty">该阶段暂无比赛或数据尚未生成 ⚽</div>';
+    return;
+  }
+
+  const roundCnMap = {
+    'Round of 32': '32强淘汰赛',
+    'Round of 16': '1/8决赛 (16强)',
+    'Quarter-final': '1/4决赛 (8强)',
+    'Semi-final': '半决赛',
+    'Match for third place': '三四名决赛',
+    'Final': '决赛'
+  };
+
+  function getRoundCn(r) {
+    for (const key in roundCnMap) {
+      if (r.includes(key)) return roundCnMap[key];
+    }
+    return r;
+  }
+
+  container.innerHTML = filtered.map(m => {
+    const t1Cn = TEAM_NAME_MAP[m.team1] || m.team1;
+    const t2Cn = TEAM_NAME_MAP[m.team2] || m.team2;
+    const flag1 = getTeamFlag(t1Cn);
+    const flag2 = getTeamFlag(t2Cn);
+
+    let t1Score = '-';
+    let t2Score = '-';
+    let statusText = '未开始';
+    let t1Class = '';
+    let t2Class = '';
+    let s1Class = '';
+    let s2Class = '';
+    let penaltyInfo = '';
+
+    if (m.score) {
+      statusText = '已结束';
+      
+      let s1 = 0;
+      let s2 = 0;
+      if (m.score.ft) {
+        s1 = m.score.ft[0];
+        s2 = m.score.ft[1];
+      }
+      
+      let finalS1 = s1;
+      let finalS2 = s2;
+      
+      if (m.score.et) {
+        finalS1 = m.score.et[0];
+        finalS2 = m.score.et[1];
+      }
+      
+      t1Score = finalS1;
+      t2Score = finalS2;
+
+      if (m.score.p) {
+        const p1 = m.score.p[0];
+        const p2 = m.score.p[1];
+        penaltyInfo = `<span class="match-p-badge">点球 ${p1}:${p2}</span>`;
+        if (p1 > p2) {
+          t1Class = 'winner'; t2Class = 'loser';
+          s1Class = 'winner'; s2Class = 'loser';
+        } else {
+          t1Class = 'loser'; t2Class = 'winner';
+          s1Class = 'loser'; s2Class = 'winner';
+        }
+      } else {
+        if (t1Score > t2Score) {
+          t1Class = 'winner'; t2Class = 'loser';
+          s1Class = 'winner'; s2Class = 'loser';
+        } else if (t2Score > t1Score) {
+          t1Class = 'loser'; t2Class = 'winner';
+          s1Class = 'loser'; s2Class = 'winner';
+        }
+      }
+    }
+
+    const roundCn = getRoundCn(m.round);
+    const matchTime = m.time ? m.time.split(' ')[0] : '';
+    const matchDateFormatted = m.date ? m.date.slice(5) : '';
+
+    return `<div class="match-card">
+      <div class="match-meta">
+        <span class="match-round">${roundCn}</span>
+        <span>${matchDateFormatted} ${matchTime}</span>
+      </div>
+      <div class="match-body">
+        <div class="match-row">
+          <div class="match-team-info ${t1Class}">
+            <span class="flag">${flag1}</span>
+            <span>${t1Cn}</span>
+          </div>
+          <div class="match-score ${s1Class}">${t1Score}</div>
+        </div>
+        <div class="match-row">
+          <div class="match-team-info ${t2Class}">
+            <span class="flag">${flag2}</span>
+            <span>${t2Cn}</span>
+          </div>
+          <div class="match-score ${s2Class}">${t2Score}</div>
+        </div>
+      </div>
+      <div class="match-footer">
+        <span>📍 ${m.ground || ''}</span>
+        ${penaltyInfo || `<span>${statusText}</span>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── INIT ───────────────────────────────────────────────
+async function init() {
+  initCountdown();
+  renderTicker();
+  renderGroups();
+  renderTeamsList('sf');
+  renderTeamsList('ch');
+  
+  await loadBetsFromDb();
+  renderLedger();
+  
+  await fetchWorldCupData();
+  processTournamentData();
+  switchScoreTab(state.currentScoreTab);
+  renderLedger();
 }
 
 init();
